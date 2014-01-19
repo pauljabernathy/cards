@@ -14,17 +14,24 @@ import static org.junit.Assert.*;
 
 import java.util.ArrayList;
 
+import org.apache.log4j.*;
+
 /**
  *
  * @author paul
  */
 public class DeckTest {
 
+    private static Logger logger;
     public DeckTest() {
+        
     }
 
     @BeforeClass
     public static void setUpClass() throws Exception {
+        logger = Logger.getLogger(DeckTest.class);
+        logger.setLevel(Level.INFO);
+        logger.addAppender(new ConsoleAppender(new PatternLayout("%m%n")));
     }
 
     @AfterClass
@@ -41,67 +48,70 @@ public class DeckTest {
 
     @Test
     public void testInitializeDeck() {
-        System.out.println("\ntesting initializeDeck()");
+        this.logger.info("\ntesting initializeDeck()");
         Deck deck = new Deck(false);
         deck.initializeDeck(false);
         ArrayList<Card> cards = deck.getCards();
-        System.out.println("size = " + cards.size());
+        this.logger.debug("size = " + cards.size());
         for(int i = 4; i < cards.size(); i++) {
             if(Rank.getIntValue(cards.get(i).getRank()) != Rank.getIntValue(cards.get(i - 4).getRank()) + 1) {
-                System.out.println(cards.get(i));
-                System.out.println(cards.get(i - 4));
+                this.logger.debug(cards.get(i));
+                this.logger.debug(cards.get(i - 4));
                 fail("cards out of order");
             }
         }
         assertEquals(52, cards.size());
+        
+        deck.initializeDeck(true);
+        //assertEquals(54, deck.getCards().size());
     }
 
-    //@Test
+    @Test
     public void testDeal() {
-        System.err.println("deal");
+        logger.info("\ntesting deal()");
         Deck instance = new Deck(false);
 
         ArrayList<Card> cardsInDeck = instance.getCards();
-        System.out.println("original deck:");
+        this.logger.debug("original deck:");
         for(int i = 0; i < cardsInDeck.size(); i++) {
-            System.out.println(cardsInDeck.get(i));
+            this.logger.debug(cardsInDeck.get(i));
         }
         
         ArrayList<Card> hand = instance.deal(3);
-        System.out.println("hand.size() = " + hand.size());
-        System.out.println("deck size = " + cardsInDeck.size());
+        this.logger.debug("hand.size() = " + hand.size());
+        this.logger.debug("deck size = " + cardsInDeck.size());
 
-        System.out.println("my hand:");
+        this.logger.debug("my hand:");
         for(int i = 0; i < hand.size(); i++) {
-            System.out.println(hand.get(i));
+            this.logger.debug(hand.get(i));
         }
-        System.out.println("cards remaining in deck:");
+        this.logger.debug("cards remaining in deck:");
         for(int i = 0; i < cardsInDeck.size(); i++) {
-            System.out.println(cardsInDeck.get(i));
+            this.logger.debug(cardsInDeck.get(i));
         }
     }
 
     /**
      *
      */
-    //@Test
+    @Test
     public void testShuffle() {
-        System.out.println("shuffle");
+        this.logger.info("\ntesting shuffle()");
         Deck instance = new Deck(false);
         instance.initializeDeck(false);
 
         ArrayList<Card> cardsInDeck = instance.getCards();
-        System.out.println("original deck:");
+        this.logger.debug("original deck:");
         for(int i = 0; i < cardsInDeck.size(); i++) {
-            System.out.println(cardsInDeck.get(i));
+            this.logger.debug(cardsInDeck.get(i));
         }
 
         instance.shuffle();
 
         cardsInDeck = instance.getCards();
-        System.out.println("\n\n\nafter shuffle:");
+        this.logger.debug("\n\n\nafter shuffle:");
         for(int i = 0; i < cardsInDeck.size(); i++) {
-            System.out.println(cardsInDeck.get(i));
+            this.logger.debug(cardsInDeck.get(i));
         }
     }
     

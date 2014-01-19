@@ -12,17 +12,23 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
+import org.apache.log4j.*;
+
 /**
  *
  * @author paul
  */
 public class SuitTest {
 
+    private static Logger logger;
     public SuitTest() {
     }
 
     @BeforeClass
     public static void setUpClass() throws Exception {
+        logger = Logger.getLogger(SuitTest.class);
+        logger.addAppender(new ConsoleAppender(new PatternLayout("%m%n")));
+        logger.setLevel(Level.INFO);
     }
 
     @AfterClass
@@ -42,11 +48,11 @@ public class SuitTest {
      */
     @Test
     public void testValues() {
-        System.out.println("values");
+        logger.info("\ntesting values()");
         Suit[] expResult = null;
         Suit[] result = Suit.values();
         for(int i = 0; i < result.length; i++) {
-            System.out.println(result[i]);
+            logger.debug(result[i]);
         }
     }
 
@@ -55,11 +61,11 @@ public class SuitTest {
      */
     @Test
     public void testValueOf() {
-        System.out.println("valueOf");
+        logger.info("\ntesting valueOf()");
         String name = "SPADES";
         Suit expResult = Suit.SPADES;
         Suit result = Suit.valueOf(name);
-        System.out.println("result = " + result);
+        logger.debug("result = " + result);
         assertEquals(expResult, result);
     }
 
@@ -68,11 +74,11 @@ public class SuitTest {
      */
     @Test
     public void testGetSuit() {
-        System.out.println("getSuit");
+        logger.info("\ntesting getSuit()");
         int suit = 0;
         Suit expResult = Suit.SPADES;
         Suit result = Suit.getSuit(suit);
-        System.out.println("result = " + result);
+        logger.debug("result = " + result);
         assertEquals(expResult, result);
     }
 

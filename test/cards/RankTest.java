@@ -12,17 +12,24 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
+import org.apache.log4j.*;
+
 /**
  *
  * @author paul
  */
 public class RankTest {
 
+    private static Logger logger;
+    
     public RankTest() {
     }
 
     @BeforeClass
     public static void setUpClass() throws Exception {
+        logger = Logger.getLogger(RankTest.class);
+        logger.addAppender(new ConsoleAppender(new PatternLayout("%m%n")));
+        logger.setLevel(Level.INFO);
     }
 
     @AfterClass
@@ -42,11 +49,11 @@ public class RankTest {
      */
     @Test
     public void testValues() {
-        System.out.println("values");
+        logger.info("\ntesting values()");
         Rank[] expResult = null;
         Rank[] result = Rank.values();
         for(int i = 0; i < result.length; i++) {
-            System.out.println(result[i]);
+            logger.debug(result[i]);
         }
     }
 
@@ -55,7 +62,7 @@ public class RankTest {
      */
     @Test
     public void testValueOf() {
-        System.out.println("valueOf");
+        logger.info("\ntesting valueOf()");
         String name = "JACK";
         Rank expResult = Rank.JACK;
         Rank result = Rank.valueOf(name);
@@ -68,11 +75,11 @@ public class RankTest {
      */
     @Test
     public void testGetRank() {
-        System.out.println("getRank");
+        logger.info("\ntesting getRank()");
         int rank = 0;
         Rank expResult = Rank.TWO;
         Rank result = Rank.getRank(rank);
-        System.out.println("result = " + result);
+        logger.debug("result = " + result);
         assertEquals(expResult, result);
     }
 
@@ -81,10 +88,10 @@ public class RankTest {
      */
     @Test
     public void testToString() {
-        System.out.println("toString");
+        logger.info("\ntesting toString()");
         Rank rank = Rank.EIGHT;
         String result = rank.toString();
-        System.out.println("result = " + rank);
+        logger.debug("result = " + rank);
         String expResult = "EIGHT";
         assertEquals(expResult, result);
     }
@@ -94,12 +101,11 @@ public class RankTest {
      */
     @Test
     public void testGetIntValue() {
-        System.out.println("testGetIntValue");
+        logger.info("\ntesting getIntValue()");
 
         Rank[] values = Rank.values();
         for(int i = 0; i < values.length; i++) {
-            System.out.println(values[i] + " " + Rank.getIntValue(values[i]));
+            logger.debug(values[i] + " " + Rank.getIntValue(values[i]));
         }
     }
-
 }

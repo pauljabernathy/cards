@@ -12,13 +12,22 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
+import org.apache.log4j.*;
+
 /**
  *
  * @author paul
  */
 public class CardTest {
 
+    private static Logger logger;
+    
     public CardTest() {
+        if(logger == null) {
+            logger = Logger.getLogger(this.getClass());
+            logger.addAppender(new ConsoleAppender(new PatternLayout("%m%n")));
+            logger.setLevel(Level.DEBUG);
+        }
     }
 
     @BeforeClass
@@ -31,6 +40,7 @@ public class CardTest {
 
     @Before
     public void setUp() {
+        
     }
 
     @After
@@ -42,11 +52,11 @@ public class CardTest {
      */
     @Test
     public void testGetRank() {
-        System.out.println("getRank");
+        logger.info("\ntesting getRank()");
         Card instance = new Card(Rank.JACK, Suit.SPADES);
         Rank expResult = Rank.JACK;
         Rank result = instance.getRank();
-        System.out.println("result = " + result);
+        logger.debug("result = " + result);
         assertEquals(expResult, result);
     }
 
@@ -55,11 +65,11 @@ public class CardTest {
      */
     @Test
     public void testGetSuit() {
-        System.out.println("getSuit");
+        logger.info("\ntesting getSuit()");
         Card instance = new Card(Rank.TEN, Suit.CLUBS);
         Suit expResult = Suit.CLUBS;
         Suit result = instance.getSuit();
-        System.out.println("result = " + result);
+        logger.debug("result = " + result);
         assertEquals(expResult, result);
     }
 
@@ -68,12 +78,17 @@ public class CardTest {
      */
     @Test
     public void testToString() {
-        System.out.println("toString");
+        logger.info("\ntesting toString()");
         Card instance = new Card(Rank.SEVEN, Suit.HEARTS);
         String expResult = "SEVEN of HEARTS";
         String result = instance.toString();
-        System.out.println("result = " + result);
+        logger.debug("result = " + result);
         assertEquals(expResult, result);
+    }
+    
+    @Test
+    public void testSomething() {
+        logger.info("\ntesting something");
     }
 
 }

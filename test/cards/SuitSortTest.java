@@ -13,17 +13,24 @@ import org.junit.Test;
 import static org.junit.Assert.*;
 import java.util.Arrays;
 
+import org.apache.log4j.*;
+
 /**
  *
  * @author paul
  */
 public class SuitSortTest {
 
+    private static Logger logger;
+    
     public SuitSortTest() {
     }
 
     @BeforeClass
     public static void setUpClass() throws Exception {
+        logger = Logger.getLogger(SuitSortTest.class);
+        logger.addAppender(new ConsoleAppender(new PatternLayout("%m%n")));
+        logger.setLevel(Level.INFO);
     }
 
     @AfterClass
@@ -43,7 +50,7 @@ public class SuitSortTest {
      */
     @Test
     public void testCompare() {
-        System.out.println("compare");
+        logger.info("\ntestin compare()");
         Card left = new Card(Rank.TWO, Suit.HEARTS);
         Card right = new Card(Rank.FOUR, Suit.HEARTS);
         SuitSort instance = new SuitSort();
@@ -68,16 +75,17 @@ public class SuitSortTest {
      */
     @Test
     public void testSort() {
+        logger.info("\ntesting sort()");
         Card[] cards = { new Card(Rank.ACE, Suit.CLUBS), new Card(Rank.TEN, Suit.CLUBS), new Card(Rank.ACE, Suit.DIAMONDS), new Card(Rank.THREE, Suit.HEARTS), new Card(Rank.EIGHT, Suit.SPADES), new Card(Rank.SEVEN, Suit.CLUBS), new Card(Rank.FOUR, Suit.HEARTS)};
-        System.out.println("unsorted:");
+        logger.debug("unsorted:");
         for(int i = 0; i < cards.length; i++) {
-            System.out.println(cards[i]);
+            logger.debug(cards[i]);
         }
 
         Arrays.sort(cards, new SuitSort());
-        System.out.println("\nsorted?");
+        logger.debug("\nsorted?");
         for(int i = 0; i < cards.length; i++) {
-            System.out.println(cards[i]);
+            logger.debug(cards[i]);
         }
     }
 }

@@ -11,17 +11,24 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
+import org.apache.log4j.*;
+
 /**
  *
  * @author paul
  */
 public class SimulatorTest {
     
+    private static Logger logger;
+    
     public SimulatorTest() {
     }
     
     @BeforeClass
     public static void setUpClass() {
+        logger = Logger.getLogger(SimulatorTest.class);
+        logger.addAppender(new ConsoleAppender(new PatternLayout("%m%n")));
+        logger.setLevel(Level.INFO);
     }
     
     @AfterClass
@@ -38,7 +45,7 @@ public class SimulatorTest {
 
     @Test
     public void testIncrementBestResults() {
-        System.out.println("\ntesting incrementBestResults()");
+        logger.info("\ntesting incrementBestResults()");
         
         Simulator instance = new Simulator();
         Deck deck = new Deck(false);
@@ -86,7 +93,7 @@ public class SimulatorTest {
     
     @Test
     public void testIncrementAllResults() {
-        System.out.println("\ntesting incrementAllResults()");
+        logger.info("\ntesting incrementAllResults()");
         
         Simulator instance = new Simulator();
         Deck deck = new Deck(false);

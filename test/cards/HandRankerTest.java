@@ -12,17 +12,24 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
+import org.apache.log4j.*;
+
 /**
  *
  * @author paul
  */
 public class HandRankerTest {
 
+    private static Logger logger;
+    
     public HandRankerTest() {
     }
 
     @BeforeClass
     public static void setUpClass() throws Exception {
+        logger = Logger.getLogger("HandRankerTest");
+        logger.addAppender(new ConsoleAppender(new PatternLayout("%m%n")));
+        logger.setLevel(Level.INFO);
     }
 
     @AfterClass
@@ -40,9 +47,9 @@ public class HandRankerTest {
     /**
      * Test of checkForPair method, of class HandRanker.
      */
-    //@Test
+    @Test
     public void testCheckForPair() {
-        System.out.println("checkForPair");
+        logger.info("\ntesting checkForPair()");
 
         //null
         Card[] cards = null;
@@ -83,9 +90,9 @@ public class HandRankerTest {
     /**
      *
      */
-    //@Test
+    @Test
     public void testCheckForTwoPair() {
-        System.out.println("checkForTwoPair");
+        logger.info("\ntesting checkForTwoPair()");
 
         //null
         Card[] cards = null;
@@ -112,9 +119,9 @@ public class HandRankerTest {
     /**
      * Test of checkForPair method, of class HandRanker.
      */
-    //@Test
+    @Test
     public void testCheckThreeOfAKind() {
-        System.out.println("checkForThreeOfAKind");
+        logger.info("\ntesting checkForThreeOfAKind()");
 
         //null
         Card[] cards = null;
@@ -165,7 +172,7 @@ public class HandRankerTest {
      */
     @Test
     public void testCheckForStraight() {
-        System.out.println("testCheckForStraight");
+        logger.info("\ntesting checkForStraight()");
         Card[] cards = null;
         assertEquals(false, HandRanker.checkForStraight(cards));
 
@@ -211,7 +218,7 @@ public class HandRankerTest {
      */
     @Test
     public void testFindStraight() {
-        System.out.println("testCheckForStraight");
+        logger.info("\ntesting findStraight()");
         Card[] cards = null;
         assertEquals(null, HandRanker.findStraight(cards));
 
@@ -226,7 +233,7 @@ public class HandRankerTest {
 
         cards = new Card[] { new Card(Rank.TWO, Suit.CLUBS), new Card(Rank.THREE, Suit.CLUBS), new Card(Rank.FOUR, Suit.DIAMONDS), new Card(Rank.FIVE, Suit.DIAMONDS)};
         straight = HandRanker.findStraight(cards);
-        showCards(straight);
+        //showCards(straight);
         checkStraightAgreement(cards, straight);
 
         //exact number
@@ -238,8 +245,7 @@ public class HandRankerTest {
         cards = new Card[] { new Card(Rank.TWO, Suit.CLUBS), new Card(Rank.THREE, Suit.CLUBS), new Card(Rank.FOUR, Suit.DIAMONDS), new Card(Rank.FIVE, Suit.DIAMONDS), new Card(Rank.SIX, Suit.DIAMONDS)};
         straight = HandRanker.findStraight(cards);
         showCards(straight);
-        System.out.println("********************");
-        //cards[4] = new Card(Rank.ACE, Suit.DIAMONDS);
+        //cards[4] = new Card(Rank.ACE, Suit.DIAMONDS); //when uncommented, this line causes the test to fail, as it should
         checkStraightAgreement(cards, straight);
 
         //more than 5
@@ -271,9 +277,9 @@ public class HandRankerTest {
     /**
      *
      */
-    //@Test
+    @Test
     public void checkForFlush() {
-        System.out.println("testCheckForFlush");
+        logger.info("\ntesting checkForFlush()");
         Card[] cards = null;
         assertEquals(false, HandRanker.checkForFlush(cards));
 
@@ -302,9 +308,9 @@ public class HandRankerTest {
     /**
      *
      */
-    //@Test
+    @Test
     public void testForFullHouse() {
-        System.out.println("fullHouse");
+        logger.info("\ntestin checkForFullHouse()");
         Card[] cards = null;
         assertEquals(false, HandRanker.checkForFullHouse(cards));
 
@@ -327,9 +333,9 @@ public class HandRankerTest {
     /**
      *
      */
-    //@Test
+    @Test
     public void testCheckForFourOfAKind() {
-        System.out.println("testCheckForFourOfAKind");
+        logger.info("\ntestCheckForFourOfAKind()");
         Card[] cards = null;
         assertEquals(false, HandRanker.checkForFourOfAKind(cards));
 
@@ -365,9 +371,9 @@ public class HandRankerTest {
      *
      *
      */
-    //@Test
+    @Test
     public void testForStraightFlush() {
-        System.out.println("testCheckForFlush");
+        logger.debug("\ntesting checkForFlush()");
         Card[] cards = null;
         assertEquals(false, HandRanker.checkForStraightFlush(cards));
 
@@ -405,27 +411,28 @@ public class HandRankerTest {
     }
 
     private static void showCards(Card[] cards) {
+        logger.debug("HandRanker.showCards()");
+        StringBuilder sb = new StringBuilder();
         if(cards != null) {
-            //System.out.println();
             for(Card card: cards) {
-                System.out.print(card + "  ");
+                sb.append(card).append("  ");
             }
-            System.out.println();
+            logger.debug(sb);
+            logger.debug("");
         } else {
-            //System.out.println();
-            System.out.println("cards is null");
+            logger.debug("cards is null");
         }
     }
 
     private void checkStraightAgreement(Card[] hand, Card[] straight) {
-        System.out.println("checkStraightAgreement");
-        System.out.println("hand:");
+        logger.debug("checkStraightAgreement()");
+        logger.debug("hand:");
         showHand(hand);
 
         if(straight != null) {
-            System.out.println("\n\nstraight:");
+            logger.debug("\n\nstraight:");
             showHand(straight);
-            System.out.println("HandRanker.checkForStraight(hand) = " +HandRanker.checkForStraight(hand));
+            logger.debug("HandRanker.checkForStraight(hand) = " +HandRanker.checkForStraight(hand));
         }
 
         if(HandRanker.checkForStraight(hand)  && straight == null) {
@@ -438,7 +445,7 @@ public class HandRankerTest {
 
     private void showHand(Card[] hand) {
         for(Card card: hand) {
-            System.out.println(card.toString());
+            logger.debug(card.toString());
         }
     }
 }
