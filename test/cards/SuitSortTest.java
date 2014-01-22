@@ -51,9 +51,14 @@ public class SuitSortTest {
     @Test
     public void testCompare() {
         logger.info("\ntestin compare()");
+        SuitSort instance = new SuitSort();
+        assertEquals(0, instance.compare(null, null));
+        
+        assertEquals(1, instance.compare(null, new Card(Rank.TWO, Suit.CLUBS)));
+        assertEquals(-1, instance.compare(new Card(Rank.THREE, Suit.DIAMONDS), null));
+        
         Card left = new Card(Rank.TWO, Suit.HEARTS);
         Card right = new Card(Rank.FOUR, Suit.HEARTS);
-        SuitSort instance = new SuitSort();
         int result = instance.compare(left, right);
         assertEquals(0, result);
 

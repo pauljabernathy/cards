@@ -36,8 +36,12 @@ public class Deck {
         for(int i = 0; i < 52; i++) {
             rank = Rank.getRank(i / 4);
             suit = Suit.getSuit(i % 4);
-            //cards[i] = new Card(rank, suit);
             cards.add(new Card(rank, suit));
+        }
+        
+        if(hasJokers) {
+            //TODO:  set up Jokers in Rank and Suit
+            //cards.add(new Card(Rank.JOKER, Suit.JOKER));
         }
     }
 

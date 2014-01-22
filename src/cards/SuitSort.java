@@ -13,7 +13,14 @@ import java.util.Comparator;
 public class SuitSort implements Comparator<Card> {
 
     public int compare(Card left, Card right) {
-        //TODO:  check for null
+        
+        if(left == null && right == null) {
+            return 0;
+        } else if(left == null && right != null) {
+            return 1;
+        } else if(left != null && right == null) {
+            return -1;
+        }
 
         int leftValue = Suit.getIntValue(left.getSuit());
         int rightValue = Suit.getIntValue(right.getSuit());

@@ -25,7 +25,7 @@ public class HandRanker {
             return false;
         }
 
-        Arrays.sort(cards, new NumericSort());
+       Arrays.sort(cards, new NumericSort());
 
         /*for(int i = 0; i < cards.length - 1; i++) {
             if(cards[i].getRank() == cards[i + 1].getRank()) {
@@ -74,7 +74,7 @@ public class HandRanker {
 
     /**
      * returns the indeces of the input array of the first pair found; if no pair is found, returns { -1, -1 }
-     * @param cards
+     * @param cards - an array that must be sorted
      * @return
      */
     private static int[] findPair(Card[] cards) {

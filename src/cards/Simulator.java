@@ -23,30 +23,16 @@ public class Simulator {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        /*Deck deck = new Deck(false);
-        ArrayList<Card> deal = new ArrayList<Card>();
-
-
-        //deal a specified number of times, keeping track of numerical total for rank and suit
-        int numRuns = 5;
-        int numCardsPerDeal = 5;
-        int rankTotal = 0;
-        int suitTotal = 0;
-        for(int i = 0; i < numRuns; i++) {
-            deal = deck.deal(numCardsPerDeal);
-            rankTotal += 0;
-        }
-        //divide rank and suit by number of runs, display average*/
-
-        Simulator main = new Simulator();
-        main.doSimulation(100000);
-        main.doOnePairSim(2500);
+        Simulator sim = new Simulator();
+        sim.doSimulation(900000);
+        //sim.doOnePairSim(2500);
     }
 
     public Simulator() {
         this.logger = this.createBasicLogger();
         this.timestampLogger = this.createTimeStampLogger();
     }
+    
     public void doSimulation(int numRuns) {
         timestampLogger.info("starting simulation");
         Deck deck = new Deck(false);
@@ -56,14 +42,13 @@ public class Simulator {
         int[] suits = new int[4];
         int[] ranks = new int[13];
         int handSize = 7;
-        //int numRuns = 1000;
         int suit = -1;
         int rank = -1;
         ArrayList<Card> handAL = new ArrayList<Card>();
         Card[] hand = new Card[handSize];
         for(int runNum = 0; runNum < numRuns; runNum++) {
-            if(numRuns % 1000 == 0) {
-            logger.debug("\n\n\n\nrun " + runNum);
+            if(runNum % 10000 == 0) {
+                logger.debug("run " + runNum);
             }
             deck.initializeDeck(true);
             deck.shuffle();
@@ -71,7 +56,6 @@ public class Simulator {
             handAL.toArray(hand);
 
             for(Card card: hand) {
-                //System.out.println(card.toString());
                 suit = Suit.getIntValue(card.getSuit());
                 suits[suit]++;
                 rank = Rank.getIntValue(card.getRank());
@@ -91,13 +75,20 @@ public class Simulator {
         
         logger.info("\n\nThese are the counts of the ranks and suits:");
         logger.info("suit");
+        int total = 0;
         for(suit = 0; suit < 4; suit++) {
-            logger.info(suits[suit] + "  " + Suit.getSuit(suit));
+            logger.info(Suit.getSuit(suit) + " " + suits[suit] + " " + (double)suits[suit] * 100.0 / ((double)numRuns * (double)handSize) + "%");
+            total += suits[suit];
         }
-        logger.info("suit");
+        logger.info("total = " + total);
+        
+        logger.info("\nsuit");
+        total = 0;
         for(rank = 0; rank < 13; rank++) {
-            logger.info(ranks[rank] + "  " + Rank.getRank(rank));
+            logger.info(Rank.getRank(rank) + "  " + ranks[rank] + " " + (double)ranks[rank] * 100.0 / ((double)numRuns * (double)handSize) + "%");
+            total += ranks[rank];
         }
+        logger.info("total = " + total);
         timestampLogger.info("ending simulation");
     }
     
@@ -183,16 +174,16 @@ public class Simulator {
     }
     
     private void showResults(int[] results, int numRuns) {
-        System.out.println("High Card:  " + results[0] + "   " + (((double)results[0]) / numRuns) * 100.0 + "%");
-        System.out.println("One Pair:  " + results[1] + "   " + (((double)results[1]) / numRuns) * 100.0 + "%");
-        System.out.println("Two Pairs:  " + results[2] + "   " + (((double)results[2]) / numRuns) * 100.0 + "%");
-        System.out.println("Three of a Kind:  " + results[3] + "   " + (((double)results[3]) / numRuns) * 100.0 + "%");
-        System.out.println("Straight:  " + results[4] + "   " + (((double)results[4]) / numRuns) * 100.0 + "%");
-        System.out.println("Flush:  " + results[5] + "   " + (((double)results[5]) / numRuns) * 100.0 + "%");
-        System.out.println("Full House:  " + results[6] + "   " + (((double)results[6]) / numRuns) * 100.0 + "%");
-        System.out.println("Four of a Kind:  " + results[7] + "   " + (((double)results[7]) / numRuns) * 100.0 + "%");
-        System.out.println("Straight Flush:  " + results[8] + "   " + (((double)results[8]) / numRuns) * 100.0 + "%");
-        System.out.println("Royal Flush:  " + results[9] + "   " + (((double)results[9]) / numRuns) * 100.0 + "%");
+        this.logger.info("High Card:  " + results[0] + "   " + (((double)results[0]) / numRuns) * 100.0 + "%");
+        this.logger.info("One Pair:  " + results[1] + "   " + (((double)results[1]) / numRuns) * 100.0 + "%");
+        this.logger.info("Two Pairs:  " + results[2] + "   " + (((double)results[2]) / numRuns) * 100.0 + "%");
+        this.logger.info("Three of a Kind:  " + results[3] + "   " + (((double)results[3]) / numRuns) * 100.0 + "%");
+        this.logger.info("Straight:  " + results[4] + "   " + (((double)results[4]) / numRuns) * 100.0 + "%");
+        this.logger.info("Flush:  " + results[5] + "   " + (((double)results[5]) / numRuns) * 100.0 + "%");
+        this.logger.info("Full House:  " + results[6] + "   " + (((double)results[6]) / numRuns) * 100.0 + "%");
+        this.logger.info("Four of a Kind:  " + results[7] + "   " + (((double)results[7]) / numRuns) * 100.0 + "%");
+        this.logger.info("Straight Flush:  " + results[8] + "   " + (((double)results[8]) / numRuns) * 100.0 + "%");
+        this.logger.info("Royal Flush:  " + results[9] + "   " + (((double)results[9]) / numRuns) * 100.0 + "%");
     }
     
     public void doOnePairSim(int numRuns) {
@@ -205,7 +196,7 @@ public class Simulator {
         long previousMillis = now.getTime();
         long currentMillis = now.getTime();
         for(int runNum = 0; runNum < numRuns; runNum++) {
-            //System.out.println("\n\n\n\nrun " + runNum);
+            //this.logger.debug("\n\n\n\nrun " + runNum);
             if(runNum % 100 == 0) {
                 logger.debug("rum " + runNum);
             }
