@@ -6,8 +6,11 @@
 package cards;
 
 import java.util.ArrayList;
+import java.util.List;
 import org.apache.log4j.*;
 import java.util.Date;
+
+import toolbox.stats.*;
 
 /**
  *
@@ -24,8 +27,11 @@ public class Simulator {
      */
     public static void main(String[] args) {
         Simulator sim = new Simulator();
-        sim.doSimulation(900000);
+        sim.setLogLevel(Level.INFO);
+        int numDeals = 90000;
+        List<Histogram> hists = sim.doSimulation(numDeals);
         //sim.doOnePairSim(2500);
+        showResults(hists, sim.getLogger());
     }
 
     public Simulator() {
@@ -33,10 +39,11 @@ public class Simulator {
         this.timestampLogger = this.createTimeStampLogger();
     }
     
-    public void doSimulation(int numRuns) {
-        timestampLogger.info("starting simulation");
+    public List<Histogram> doSimulation(int numRuns) {
+        //timestampLogger.info("starting simulation");
+        logger.info("");
         Deck deck = new Deck(false);
-        logger.info("deck.size() = " + deck.getCards().size());
+        logger.debug("deck.size() = " + deck.getCards().size());
         int[] bestResults = new int[10];
         int[] allResults = new int[10];
         int[] suits = new int[4];
@@ -48,7 +55,7 @@ public class Simulator {
         Card[] hand = new Card[handSize];
         for(int runNum = 0; runNum < numRuns; runNum++) {
             if(runNum % 10000 == 0) {
-                logger.debug("run " + runNum);
+                logger.debug(runNum + " hands dealt");
             }
             deck.initializeDeck(true);
             deck.shuffle();
@@ -65,31 +72,54 @@ public class Simulator {
             bestResults = this.incrementBestResults(hand, bestResults);
             allResults = this.incrementAllResults(hand, allResults);
         }
-
-        logger.info("best results:\n");
-        showResults(bestResults, numRuns);
-        
-        logger.info("\n\nall results:\n");
-        showResults(allResults, numRuns);
-        
-        
-        logger.info("\n\nThese are the counts of the ranks and suits:");
-        logger.info("suit");
-        int total = 0;
-        for(suit = 0; suit < 4; suit++) {
-            logger.info(Suit.getSuit(suit) + " " + suits[suit] + " " + (double)suits[suit] * 100.0 / ((double)numRuns * (double)handSize) + "%");
-            total += suits[suit];
+        Histogram bestHands = new Histogram();
+        Histogram allHands = new Histogram();
+        Histogram allSuits = new Histogram();
+        Histogram allRanks = new Histogram();
+        try {
+            bestHands = new Histogram(new Hand[] { Hand.HIGH_CARD, Hand.ONE_PAIR, Hand.TWO_PAIRS, Hand.THREE_OF_A_KIND, Hand.STRAIGHT, Hand.FLUSH, Hand.FULL_HOUSE,  Hand.FOUR_OF_A_KIND, Hand.STRAIGHT_FLUSH, Hand.ROYAL_FLUSH }, bestResults);
+            bestHands.setLabel("Best Results Histogram");
+            logger.debug("\nbest results histogram");
+            logger.debug(bestHands.toString());
+        } catch(ProbabilityException e) {
+            logger.error(e.getClass() + " in doSimulation():  " + e.getMessage());
         }
-        logger.info("total = " + total);
         
-        logger.info("\nsuit");
-        total = 0;
-        for(rank = 0; rank < 13; rank++) {
-            logger.info(Rank.getRank(rank) + "  " + ranks[rank] + " " + (double)ranks[rank] * 100.0 / ((double)numRuns * (double)handSize) + "%");
-            total += ranks[rank];
+        try {
+            allHands = new Histogram(new Hand[] { Hand.HIGH_CARD, Hand.ONE_PAIR, Hand.TWO_PAIRS, Hand.THREE_OF_A_KIND, Hand.STRAIGHT, Hand.FLUSH, Hand.FULL_HOUSE,  Hand.FOUR_OF_A_KIND, Hand.STRAIGHT_FLUSH, Hand.ROYAL_FLUSH }, allResults);
+            allHands.setLabel("All Results Histogram");
+            logger.debug("\nall results histogram");
+            logger.debug(allHands.toString());
+        } catch(ProbabilityException e) {
+            logger.error(e.getClass() + " in doSimulation():  " + e.getMessage());
         }
-        logger.info("total = " + total);
-        timestampLogger.info("ending simulation");
+        
+        try {
+            allSuits = new Histogram(new Suit[] { Suit.SPADES, Suit.HEARTS, Suit.DIAMONDS, Suit.CLUBS }, suits);
+            allSuits.setLabel("Suits Histogram");
+            logger.debug("\nsuits histogram");
+            logger.debug(allSuits.toString());
+        } catch(ProbabilityException e) {
+            logger.error(e.getClass() + " in doSimulation():  " + e.getMessage());
+        }
+        
+        try {
+            allRanks = new Histogram(new Rank[] { Rank.TWO, Rank.THREE, Rank.FOUR, Rank.FIVE, Rank.SIX, Rank.SEVEN, Rank.EIGHT, Rank.NINE, Rank.TEN, Rank.JACK, Rank.QUEEN, Rank.KING, Rank.ACE }, ranks);
+            allRanks.setLabel("Ranks Histogram");
+            logger.debug("\nranks histogram");
+            logger.debug(allRanks.toString());
+        } catch(ProbabilityException e) {
+            logger.error(e.getClass() + " in doSimulation():  " + e.getMessage());
+        }
+        
+        List<Histogram> hists = new ArrayList<Histogram>();
+        hists.add(bestHands);
+        hists.add(allHands);
+        hists.add(allSuits);
+        hists.add(allRanks);
+        
+        //timestampLogger.info("ending simulation");
+        return hists;
     }
     
     private Logger createBasicLogger() {
@@ -106,6 +136,20 @@ public class Simulator {
         return logger;
     }
 
+    public Logger getLogger() {
+        return this.logger;
+    }
+    
+    public void addAppender(Appender appender) {
+        this.logger.addAppender(appender);
+        this.timestampLogger.addAppender(appender);
+    }
+    
+    public void setLogLevel(Level level) {
+        this.logger.setLevel(level);
+        this.timestampLogger.setLevel(level);
+    }
+    
     private void showHand(Card[] hand, Logger logger) {
         for(Card card: hand) {
             logger.debug(card.toString());
@@ -115,6 +159,9 @@ public class Simulator {
     protected int[] incrementBestResults(Card[] hand, int[] results) {
         if(results == null) {
             results = new int[NUM_RANKS];
+        }
+        if(HandRanker.checkForRoyalFlush(hand)) {
+            results[9]++;
         }
         if(HandRanker.checkForStraightFlush(hand)) {
             results[8]++;
@@ -173,6 +220,12 @@ public class Simulator {
         return results;
     }
     
+    public static void showResults(List<Histogram> hists, Logger logger) {
+        for(Histogram hist : hists) {
+            logger.info("\n" + hist.toString());
+        }
+    }
+    
     private void showResults(int[] results, int numRuns) {
         this.logger.info("High Card:  " + results[0] + "   " + (((double)results[0]) / numRuns) * 100.0 + "%");
         this.logger.info("One Pair:  " + results[1] + "   " + (((double)results[1]) / numRuns) * 100.0 + "%");
@@ -217,5 +270,31 @@ public class Simulator {
         }
         
         logger.info("# of pairs = " + results[1] + ";  " + (double)results[1] / (double)numRuns + "%");
+    }
+    
+    public ProbDist<Hand> getTheoreticalProbabilities() {
+        ProbDist<Hand> p = new ProbDist<Hand>();
+        /*p.add(Hand.ROYAL_FLUSH, Constants.ROYAL_FLUSH_PROB);
+        p.add(Hand.STRAIGHT_FLUSH, Constants.STRAIGHT_FLUSH_PROB);
+        p.add(Hand.FOUR_OF_A_KIND, Constants.FOUR_OF_A_KIND_PROB);
+        p.add(Hand.FULL_HOUSE, Constants.FULL_HOUSE_PROB);
+        p.add(Hand.FLUSH, Constants.FLUSH_PROB);
+        p.add(Hand.STRAIGHT, Constants.STRAIGH_PROB);
+        p.add(Hand.THREE_OF_A_KIND, Constants.THREE_OF_A_KIND_PROB);
+        p.add(Hand.TWO_PAIRS, Constants.TWO_PAIRS_PROB);
+        p.add(Hand.ONE_PAIR, Constants.ONE_PAIR_PROB);
+        p.add(Hand.HIGH_CARD, Constants.HIGH_CARD_PROB);*/
+        p.add(Hand.HIGH_CARD, Constants.HIGH_CARD_PROB);
+        p.add(Hand.ONE_PAIR, Constants.ONE_PAIR_PROB);
+        p.add(Hand.TWO_PAIRS, Constants.TWO_PAIRS_PROB);
+        p.add(Hand.THREE_OF_A_KIND, Constants.THREE_OF_A_KIND_PROB);
+        p.add(Hand.STRAIGHT, Constants.STRAIGHT_PROB);
+        p.add(Hand.FLUSH, Constants.FLUSH_PROB);
+        p.add(Hand.FULL_HOUSE, Constants.FULL_HOUSE_PROB);
+        p.add(Hand.FOUR_OF_A_KIND, Constants.FOUR_OF_A_KIND_PROB);
+        p.add(Hand.STRAIGHT_FLUSH, Constants.STRAIGHT_FLUSH_PROB);
+        p.add(Hand.ROYAL_FLUSH, Constants.ROYAL_FLUSH_PROB);
+        p.setLabel("Theortical Probabilities");
+        return p;
     }
 }
