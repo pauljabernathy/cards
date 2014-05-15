@@ -25,7 +25,7 @@ public class SimulatorServlet extends HttpServlet {
         PrintWriter out = response.getWriter();
         
         out.println("<html><head><title>Texas Hold 'em Simulator</title></head><body>");
-        out.println("<p>This page shows a <a href=\"http://en.wikipedia.org/wiki/Monte_Carlo_algorithm\">monte carlo simulation</a> of <a href=\"http://en.wikipedia.org/wiki/Texas_hold_%27em\">Texas Hold 'em</a> deals</p>");
+        out.println("<p>This page shows a <a href=\"http://en.wikipedia.org/wiki/Monte_Carlo_algorithm\"  target=\"blank\">monte carlo simulation</a> of <a href=\"http://en.wikipedia.org/wiki/Texas_hold_%27em\"  target=\"blank\">Texas Hold 'em</a> deals</p>");
         out.println("<form action=\"\">");
         out.println("enter number of deals:  <input type=text name=numruns>");
         out.println("<input type=submit value=run");
@@ -48,7 +48,7 @@ public class SimulatorServlet extends HttpServlet {
         }
         sim.setLogLevel(Level.INFO);
         List<Histogram> hists = sim.doSimulation(numRuns);
-        out.println("<p>This first histogram is for the best hand types for each deal.  If you get a full and a pair of eights in the same deal, it only counts the full house.  The total at the bottom should be the same as the number of deals.  The <a href=\"http://en.wikipedia.org/wiki/List_of_poker_hands\">theoretical probabilties</a> are shown next to it for comparison.");
+        out.println("<p>This first histogram is for the best hand types for each deal.  If you get a full and a pair of eights in the same deal, it only counts the full house.  The total at the bottom should be the same as the number of deals.  The <a href=\"http://en.wikipedia.org/wiki/List_of_poker_hands\" target=\"_\">theoretical probabilties</a> are shown next to it for comparison.");
         out.println("<table width=100%><tr><td valign=top>" + hists.get(0).asXHTMLTable() + "</td><td valign=top>" + sim.getTheoreticalProbabilities().asXHTMLTable() + "</td></tr></table>");
         out.println("<p>This next histogram is for all hand types.  If you get a full house and a pair of eights in the same deal, it counts both.  The total at the bottom will usually be 1.39 to 1.4 times the number of deals.</p>");
         out.println("<p>" + hists.get(1).asXHTMLTable() + "</p>");
