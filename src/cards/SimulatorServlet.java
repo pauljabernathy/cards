@@ -5,6 +5,7 @@
 package cards;
 
 import javax.servlet.http.*;
+import javax.servlet.*;
 import java.io.PrintWriter;
 import java.io.IOException;
 import org.apache.log4j.*;
@@ -21,10 +22,10 @@ public class SimulatorServlet extends HttpServlet {
     private static Appender appender;
     private boolean addedAppender = false;
     
-    public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         PrintWriter out = response.getWriter();
         
-        out.println("<html><head><title>Texas Hold 'em Simulator</title></head><body>");
+        out.println("<html><head><title>Texas Hold 'em Simulator</title><script src=\"ga.js\"></script></head><body>");
         out.println("<p>This page shows a <a href=\"http://en.wikipedia.org/wiki/Monte_Carlo_algorithm\"  target=\"blank\">monte carlo simulation</a> of <a href=\"http://en.wikipedia.org/wiki/Texas_hold_%27em\"  target=\"blank\">Texas Hold 'em</a> deals</p>");
         out.println("<form action=\"\">");
         out.println("enter number of deals:  <input type=text name=numruns>");
@@ -61,6 +62,8 @@ public class SimulatorServlet extends HttpServlet {
         out.println("<ul>");
         out.println("<li>Inccorect logic in detecting straight flushes and royal flushes, so those hands are under reported.</li>");
         out.println("</ul>");
+        RequestDispatcher dispatcher = request.getRequestDispatcher("footer.jsp");
+        dispatcher.include(request, response);
         out.println("</body></html>");
     }
 }
