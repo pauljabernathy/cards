@@ -62,7 +62,7 @@ public class SimulatorServlet extends HttpServlet {
         out.println("<ul>");
         out.println("<li>Inccorect logic in detecting straight flushes and royal flushes, so those hands are under reported.</li>");
         out.println("</ul>");
-        RequestDispatcher dispatcher = request.getRequestDispatcher("footer.jsp");
+        RequestDispatcher dispatcher = request.getRequestDispatcher("footer.html");
         dispatcher.include(request, response);
         out.println("</body></html>");
     }
