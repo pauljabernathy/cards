@@ -6,6 +6,8 @@
 package cards;
 import java.util.Arrays;
 import java.util.ArrayList;
+import java.util.List;
+import toolbox.Utilities;
 
 /**
  *
@@ -141,6 +143,26 @@ public class HandRanker {
         }
         return null;
     }
+    
+    /**
+     * /
+     * @param cards
+     * @return 
+     */
+    public static List<Card[]> findStraights(Card[] cards) {
+        if(cards == null) {
+            return new ArrayList<Card[]>();
+        }
+        List<Card[]> straights = new ArrayList<Card[]>();
+        Arrays.sort(cards, new NumericSort());
+        //TODO:  looks like there is a bug here where if you have two cards of the same number, it will not see both
+        for(int i = 0; i < cards.length - 4; i++) { //4 because you need 5 cards for a straight
+            if(isStraight(new Card[] { cards[i], cards[i+1], cards[i+2], cards[i+3], cards[i+4] })) {
+                straights.add(new Card[] { cards[i], cards[i+1], cards[i+2], cards[i+3], cards[i+4] });
+            }
+        }
+        return straights;
+    }
 
     /**
      * Returns try if the given array is a straight.  All cards in this array must be part of the straight for it to return true;
@@ -216,15 +238,32 @@ public class HandRanker {
         }
 
         //find a set of 5 cards that are a straight
-        Card[] straight = findStraight(cards);
+        /*Card[] straight = findStraight(cards);
         if(straight != null) {
             //do checkForFlush
             return checkForFlush(straight);
         }
 
+        return false;*/
+        
+        /*Arrays.sort(cards, new SuitSort());
+        for(int i = 0; i < cards.length - 4; i++) {
+            if(cards[i].getSuit() == cards[i+1].getSuit() && cards[i].getSuit() == cards[i+2].getSuit() && cards[i].getSuit() == cards[i+3].getSuit() && cards[i].getSuit() == cards[i+4].getSuit()) {
+                if(checkForStraight(new Card[] { cards[i], cards[i+1], cards[i+2], cards[i+3], cards[i+4] })) {
+                    return true;
+                }
+            }
+        }*/
+        List<Card[]> straights = findStraights(cards);
+        for(Card[] straight : straights) {
+            if(checkForFlush(straight)) {
+                return true;
+            }
+        }
         return false;
     }
     
+    //TODO:  fix the bug where if you have more than one king, queen etc. it may use the wrong one in the straight; also an issue in straight flush
     public static boolean checkForRoyalFlush(Card[] cards) {
         if(cards == null) {
             return false;
@@ -234,7 +273,37 @@ public class HandRanker {
         //find a set of 5 cards that are a straight
         
         //do checkForFlush
-
+        /*Card[] straight = findStraight(cards);
+        if(straight != null) {
+            //do checkForFlush
+            boolean isFlush = checkForFlush(straight);
+            if(!isFlush) {
+                return false;
+            } else {
+                //so now we know it is a Straight Flush, so it must be 10, Jack, Queen, King, Ace to be a Royal Flush
+                if(!straight[0].getRank().equals(Rank.TEN)) {
+                    return false;
+                }
+                return true;
+            }
+        }*/
+        /*Arrays.sort(cards, new SuitSort());
+        for(int i = 0; i < cards.length - 4; i++) {
+            System.out.println(Utilities.arrayToString(cards));
+            if(cards[i].getSuit() == cards[i+1].getSuit() && cards[i].getSuit() == cards[i+2].getSuit() && cards[i].getSuit() == cards[i+3].getSuit() && cards[i].getSuit() == cards[i+4].getSuit()) {
+                System.out.println(Utilities.arrayToString(new Card[] { cards[i], cards[i+1], cards[i+2], cards[i+3], cards[i+4] }));
+                if(checkForStraight(new Card[] { cards[i], cards[i+1], cards[i+2], cards[i+3], cards[i+4] })) {
+                    Arrays.sort(cards, new NumericSort());
+                    if(cards[i].getRank().equals(Rank.TEN)) {
+                        return true;
+                    }
+                }
+            }
+        }*/
+        List<Card[]> straights = findStraights(cards);
+        for(Card[] straight : straights) {
+            
+        }
         return false;
     }
     

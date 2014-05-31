@@ -13,6 +13,7 @@ import org.junit.Test;
 import static org.junit.Assert.*;
 
 import org.apache.log4j.*;
+import java.util.List;
 
 /**
  *
@@ -274,6 +275,59 @@ public class HandRankerTest {
 
     }
 
+    @Test
+    public void testFindStraights() {
+        logger.info("\ntesting findStraights()");
+        Card[] cards = null;
+        assertEquals(0, HandRanker.findStraights(cards).size());
+
+        cards = new Card[] { };
+        assertEquals(0, HandRanker.findStraights(cards).size());
+        
+        //not enough cards
+        cards = new Card[] { new Card(Rank.KING, Suit.CLUBS), new Card(Rank.TEN, Suit.CLUBS), new Card(Rank.ACE, Suit.DIAMONDS)};
+        List<Card[]> straights = HandRanker.findStraights(cards);
+        //showCards(straight);
+        checkAllStraightsAgreement(cards, straights);
+
+        cards = new Card[] { new Card(Rank.TWO, Suit.CLUBS), new Card(Rank.THREE, Suit.CLUBS), new Card(Rank.FOUR, Suit.DIAMONDS), new Card(Rank.FIVE, Suit.DIAMONDS)};
+        straights = HandRanker.findStraights(cards);
+        //showCards(straight);
+        checkAllStraightsAgreement(cards, straights);
+        
+        //5 cards
+        cards = new Card[] { new Card(Rank.TWO, Suit.CLUBS), new Card(Rank.THREE, Suit.CLUBS), new Card(Rank.FOUR, Suit.DIAMONDS), new Card(Rank.FIVE, Suit.DIAMONDS), new Card(Rank.SEVEN, Suit.DIAMONDS)};
+        straights = HandRanker.findStraights(cards);
+        checkAllStraightsAgreement(cards, straights);
+        assertEquals(0, straights.size());
+
+        cards = new Card[] { new Card(Rank.TWO, Suit.CLUBS), new Card(Rank.THREE, Suit.CLUBS), new Card(Rank.FOUR, Suit.DIAMONDS), new Card(Rank.FIVE, Suit.DIAMONDS), new Card(Rank.SIX, Suit.DIAMONDS)};
+        straights = HandRanker.findStraights(cards);
+        //cards[4] = new Card(Rank.ACE, Suit.DIAMONDS); //when uncommented, this line causes the test to fail, as it should
+        checkAllStraightsAgreement(cards, straights);
+        assertEquals(1, straights.size());
+        
+        //more than 5, one straight
+        cards = new Card[] { new Card(Rank.TWO, Suit.CLUBS), new Card(Rank.THREE, Suit.DIAMONDS), new Card(Rank.FOUR, Suit.DIAMONDS), new Card(Rank.FIVE, Suit.DIAMONDS), new Card(Rank.SIX, Suit.DIAMONDS), new Card(Rank.EIGHT, Suit.DIAMONDS)};
+        straights = HandRanker.findStraights(cards);
+        checkAllStraightsAgreement(cards, straights);
+        assertEquals(1, straights.size());
+        
+        //more than 5, two straights
+        cards = new Card[] { new Card(Rank.TWO, Suit.CLUBS), new Card(Rank.THREE, Suit.DIAMONDS), new Card(Rank.FOUR, Suit.DIAMONDS), new Card(Rank.FIVE, Suit.DIAMONDS), new Card(Rank.SIX, Suit.DIAMONDS), new Card(Rank.SEVEN, Suit.DIAMONDS)};
+        straights = HandRanker.findStraights(cards);
+        checkAllStraightsAgreement(cards, straights);
+        assertEquals(2, straights.size());
+        assertEquals(Rank.TWO, straights.get(0)[0].getRank());
+        assertEquals(Rank.THREE, straights.get(1)[0].getRank());
+        
+        
+        cards = new Card[] { new Card(Rank.TWO, Suit.HEARTS), new Card(Rank.THREE, Suit.HEARTS), new Card(Rank.FOUR, Suit.HEARTS), new Card(Rank.TEN, Suit.CLUBS),  new Card(Rank.SIX, Suit.DIAMONDS), new Card(Rank.FIVE, Suit.HEARTS), new Card(Rank.SIX, Suit.HEARTS) };
+        straights = HandRanker.findStraights(cards);
+        checkAllStraightsAgreement(cards, straights);
+        assertEquals(2, straights.size());
+    }
+    
     /**
      *
      */
@@ -407,9 +461,52 @@ public class HandRankerTest {
         assertEquals(true, HandRanker.checkForStraightFlush(cards));
         cards = new Card[] { new Card(Rank.TWO, Suit.DIAMONDS), new Card(Rank.THREE, Suit.HEARTS), new Card(Rank.FOUR, Suit.HEARTS), new Card(Rank.TEN, Suit.CLUBS), new Card(Rank.FIVE, Suit.HEARTS), new Card(Rank.SIX, Suit.HEARTS),  new Card(Rank.NINE, Suit.HEARTS) };
         assertEquals(false, HandRanker.checkForStraightFlush(cards));
+        
+        //one with more than one rank
+        cards = new Card[] { new Card(Rank.TWO, Suit.HEARTS), new Card(Rank.THREE, Suit.HEARTS), new Card(Rank.FOUR, Suit.HEARTS), new Card(Rank.TEN, Suit.CLUBS), new Card(Rank.FIVE, Suit.HEARTS), new Card(Rank.SIX, Suit.HEARTS),  new Card(Rank.SIX, Suit.DIAMONDS) };
+        assertEquals(true, HandRanker.checkForStraightFlush(cards));
+        cards = new Card[] { new Card(Rank.TWO, Suit.HEARTS), new Card(Rank.THREE, Suit.HEARTS), new Card(Rank.FOUR, Suit.HEARTS), new Card(Rank.TEN, Suit.CLUBS),  new Card(Rank.SIX, Suit.DIAMONDS), new Card(Rank.FIVE, Suit.HEARTS), new Card(Rank.SIX, Suit.HEARTS) };
+        assertEquals(true, HandRanker.checkForStraightFlush(cards));
 
     }
 
+    @Test
+    public void checkForRoyalFlush() {
+        logger.info("\ntesting checkForRoyalFlush()");
+        Card[] cards = null;
+        assertEquals(false, HandRanker.checkForRoyalFlush(cards));
+
+        cards = new Card[] { };
+        //assertEquals(false, HandRanker.checkForRoyalFlush(cards));
+
+        //not enough cards
+        cards = new Card[] { new Card(Rank.TWO, Suit.HEARTS), new Card(Rank.THREE, Suit.HEARTS), new Card(Rank.FIVE, Suit.HEARTS), new Card(Rank.JACK, Suit.HEARTS) };
+        //assertEquals(false, HandRanker.checkForRoyalFlush(cards));
+        cards = new Card[] { new Card(Rank.KING, Suit.CLUBS), new Card(Rank.TEN, Suit.CLUBS), new Card(Rank.ACE, Suit.DIAMONDS)};
+        //assertEquals(false, HandRanker.checkForRoyalFlush(cards));
+
+        //5 cards
+        cards = new Card[] { new Card(Rank.TWO, Suit.HEARTS), new Card(Rank.THREE, Suit.HEARTS), new Card(Rank.FIVE, Suit.HEARTS), new Card(Rank.JACK, Suit.HEARTS),  new Card(Rank.NINE, Suit.HEARTS) };
+        //assertEquals(false, HandRanker.checkForRoyalFlush(cards));
+        cards = new Card[] { new Card(Rank.TWO, Suit.HEARTS), new Card(Rank.THREE, Suit.HEARTS), new Card(Rank.FIVE, Suit.HEARTS), new Card(Rank.JACK, Suit.HEARTS),  new Card(Rank.NINE, Suit.DIAMONDS) };
+        //assertEquals(false, HandRanker.checkForRoyalFlush(cards));
+        
+        cards = new Card[] { new Card(Rank.TEN, Suit.HEARTS), new Card(Rank.NINE, Suit.HEARTS), new Card(Rank.QUEEN, Suit.HEARTS), new Card(Rank.JACK, Suit.HEARTS),  new Card(Rank.KING, Suit.HEARTS) };
+        //assertEquals(false, HandRanker.checkForRoyalFlush(cards));
+        cards = new Card[] { new Card(Rank.TEN, Suit.DIAMONDS), new Card(Rank.ACE, Suit.HEARTS), new Card(Rank.QUEEN, Suit.HEARTS), new Card(Rank.JACK, Suit.HEARTS),  new Card(Rank.KING, Suit.HEARTS) };
+        //assertEquals(false, HandRanker.checkForRoyalFlush(cards));
+        cards = new Card[] { new Card(Rank.TEN, Suit.HEARTS), new Card(Rank.ACE, Suit.HEARTS), new Card(Rank.QUEEN, Suit.HEARTS), new Card(Rank.JACK, Suit.HEARTS),  new Card(Rank.KING, Suit.HEARTS) };
+        //assertEquals(true, HandRanker.checkForRoyalFlush(cards));
+        
+        //7 cards
+        cards = new Card[] { new Card(Rank.TEN, Suit.HEARTS), new Card(Rank.ACE, Suit.HEARTS), new Card(Rank.QUEEN, Suit.HEARTS), new Card(Rank.JACK, Suit.HEARTS),  new Card(Rank.KING, Suit.HEARTS), new Card(Rank.FIVE, Suit.CLUBS), new Card(Rank.FIVE, Suit.HEARTS) };
+        //assertEquals(true, HandRanker.checkForRoyalFlush(cards));
+        cards = new Card[] { new Card(Rank.TEN, Suit.HEARTS), new Card(Rank.ACE, Suit.HEARTS), new Card(Rank.QUEEN, Suit.HEARTS), new Card(Rank.JACK, Suit.HEARTS),  new Card(Rank.KING, Suit.HEARTS), new Card(Rank.KING, Suit.CLUBS), new Card(Rank.FIVE, Suit.HEARTS) };
+        //assertEquals(true, HandRanker.checkForRoyalFlush(cards));
+        cards = new Card[] { new Card(Rank.TEN, Suit.HEARTS), new Card(Rank.ACE, Suit.HEARTS), new Card(Rank.QUEEN, Suit.HEARTS), new Card(Rank.KING, Suit.CLUBS), new Card(Rank.FIVE, Suit.HEARTS), new Card(Rank.JACK, Suit.HEARTS),  new Card(Rank.KING, Suit.HEARTS) };
+        assertEquals(true, HandRanker.checkForRoyalFlush(cards));
+    }
+    
     private static void showCards(Card[] cards) {
         logger.debug("HandRanker.showCards()");
         StringBuilder sb = new StringBuilder();
@@ -424,6 +521,12 @@ public class HandRankerTest {
         }
     }
 
+    private void checkAllStraightsAgreement(Card[] hand, List<Card[]> straights) {
+        for(Card[] straight : straights) {
+            checkStraightAgreement(hand, straight);
+        }
+    }
+    
     private void checkStraightAgreement(Card[] hand, Card[] straight) {
         logger.debug("checkStraightAgreement()");
         logger.debug("hand:");
