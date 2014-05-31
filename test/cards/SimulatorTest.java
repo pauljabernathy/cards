@@ -12,6 +12,8 @@ import org.junit.Test;
 import static org.junit.Assert.*;
 
 import org.apache.log4j.*;
+import toolbox.Utilities;
+import toolbox.stats.ProbDist;
 
 /**
  *
@@ -28,7 +30,7 @@ public class SimulatorTest {
     public static void setUpClass() {
         logger = Logger.getLogger(SimulatorTest.class);
         logger.addAppender(new ConsoleAppender(new PatternLayout("%m%n")));
-        logger.setLevel(Level.INFO);
+        logger.setLevel(Level.DEBUG);
     }
     
     @AfterClass
@@ -117,5 +119,26 @@ public class SimulatorTest {
         
         results = instance.incrementAllResults(hand, results);
         assertArrayEquals(new int[] { 1, 2, 0, 0, 2, 0, 0, 0, 0}, results);
+    }
+    
+    @Test
+    public void testGetTheoreticalProbabilities() {
+        logger.info("\ntesting getTheoreticalProbabilities()");
+        Simulator instance = new Simulator();
+        ProbDist<Hand> p = null;
+        p = instance.getTheoreticalProbabilities();
+        for(Hand h : p.getValues()) {
+            logger.debug(h);
+        }
+        for(int i = 0; i < p.getProbabilities().size(); i++) {
+            logger.debug(p.getValue(i) + " " + p.getProbabilities().get(i) + " " + p.getValues().get(i));
+        }
+        logger.debug("values.size() = " + p.getValues().size());
+        logger.debug("probs.size() = " + p.getProbabilities().size());
+        //assertEquals(10, p.getProbabilities().size());
+        double sum = Utilities.sum(p.getProbabilities());
+        assertEquals(1.0, sum, .00001);
+        logger.debug("sum = " + sum);
+        logger.debug(p.toString());
     }
 }
